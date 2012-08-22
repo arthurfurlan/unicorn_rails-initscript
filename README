@@ -1,0 +1,17 @@
+Debian initscript for unicorn_rails.
+
+ 1. Save the files under the same structure of this repository:
+    - /etc/init.d/unicorn_rails
+    - /etc/default/unicorn_rails
+
+ 2. Configure the default settings files:
+    - /etc/default/unicorn_rails
+
+ 3. Configure your projects settings files:
+    - /etc/unicorn_rails.d/PROJ1.conf
+    - /etc/unicorn_rails.d/PROJ2.conf
+
+ 4. Manage the daemons:
+    - /etc/init.d/unicorn_rails start [ PROJ1 [ PROJ2 [ ... ] ] ]
+    - /etc/init.d/unicorn_rails stop [ PROJ1 [ PROJ2 [ ... ] ] ]
+    - /etc/init.d/unicorn_rails restart [ PROJ1 [ PROJ2 [ ... ] ] ]
