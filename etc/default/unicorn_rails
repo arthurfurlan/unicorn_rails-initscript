@@ -14,6 +14,9 @@
 # Configuration file for "unicorn_rails" initscript
 #
 
+# Rails configuration
+RAILS_ENV="production"
+
 # Daemon configuration
 #DAEMON_PATH="/usr/bin/unicorn_rails"
 RUN_AS="www-data"
