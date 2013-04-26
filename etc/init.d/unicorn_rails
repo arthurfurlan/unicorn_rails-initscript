@@ -10,27 +10,35 @@
 # Description:       Start and stop unicorn_rails process
 ### END INIT INFO
 
-# Author: Arthur Furlan <afurlan@confi.gr>
+## Author: Arthur Furlan <afurlan@confi.gr>
+
+
+##
+## WARNING:
+## This file was automatically generarated and is activelly maintained by CONFIGR.
+## While it can still be managed manually, it is definitevly not recomended. Please
+## use the CONFIGR's web interface to manage this file and its respective services.
+##
 
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="generic unicorn_rails initscript"
 NAME="unicorn_rails"
-DAEMON=/usr/bin/unicorn_rails
+DAEMON=/usr/local/bin/bundle
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 DAEMON_PATH=$DAEMON
 
-# Read global configuration variable file if it is present
+## read global configuration variable file if it is present
 [ -r /etc/default/$NAME ] && . /etc/default/$NAME
 
-# Load the VERBOSE setting and other rcS variables
+## load the VERBOSE setting and other rcS variables
 . /lib/init/vars.sh
 
-# Define LSB log_* functions.
-# Depend on lsb-base (>= 3.0-6) to ensure that this file is present.
+## define LSB log_* functions.
+## depend on lsb-base (>= 3.0-6) to ensure that this file is present.
 . /lib/lsb/init-functions
 
-# Make a backup of the original variables values
+## make a backup of the original variables values
 ORIG_DAEMON_PATH=$DAEMON_PATH
 
 _do_start_project()
@@ -40,22 +48,21 @@ _do_start_project()
     PIDFILE=/var/run/unicorn_rails-$NAME.pid
     DAEMON_PATH=$ORIG_DAEMON_PATH
 
-    # Return
-    #   3 if configuration file does not exist
+    ## return:
+    ##   3 if configuration file does not exist
     [ ! -r /etc/unicorn_rails.d/$CONF ] && return 3
 
-    # Stop the service if it's actually running
+    ## stop the service if it's actually running
     [ -f $PIDFILE ] && _do_stop_project $1
 
-    # Read project configuration variable file
+    ## read project configuration variable file
     . /etc/unicorn_rails.d/$CONF
 
-    # Return
-    #   0 if daemon has been started
-    #   1 if daemon was already running
-    #   2 if daemon could not be started
-    start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON_PATH -d $ROOTDIR --test > /dev/null || return 1
-    start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON_PATH --background --make-pidfile --chuid $RUN_AS --startas $DAEMON_PATH -- $DAEMON_ARGS || return 2
+    ## return:
+    ##   0 if daemon has been started
+    ##   1 if daemon was already running
+    ##   2 if daemon could not be started
+    cd $ROOTAPP && $DAEMON_PATH exec unicorn_rails -c $UNICORN -D -E $RAILS_ENV > /dev/null
 }
 
 _do_stop_project()
@@ -65,29 +72,21 @@ _do_stop_project()
     PIDFILE=/var/run/unicorn_rails-$NAME.pid
     DAEMON_PATH=$ORIG_DAEMON_PATH
 
-    # Return
-    #   3 if configuration file does not exist
+    ## return:
+    ##   3 if configuration file does not exist
     [ ! -r /etc/unicorn_rails.d/$CONF ] && return 3
 
-    # Read project configuration variable file
+    ## read project configuration variable file
     . /etc/unicorn_rails.d/$CONF
 
-    # Return
-    #   0 if daemon has been stopped
-    #   1 if daemon was already stopped
-    #   2 if daemon could not be stopped
-    #   other if a failure occurred
-    start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE > /dev/null # --name $DAEMON_PATH
+    ## return:
+    ##   0 if daemon has been stopped
+    ##   1 if daemon was already stopped
+    ##   2 if daemon could not be stopped
+    ##   other if a failure occurred
+    start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE > /dev/null
     RETVAL="$?"
     [ "$RETVAL" = 2 ] && return 2
-    # Wait for children to finish too if this is a daemon that forks
-    # and if the daemon is only ever run from this initscript.
-    # If the above conditions are not satisfied then add some other code
-    # that waits for the process to drop all resources that could be
-    # needed by services started subsequently.  A last resort is to
-    # sleep for some time.
-    start-stop-daemon --stop --quiet --oknodo --retry=0/30/KILL/5 --exec $DAEMON_PATH
-    [ "$?" = 2 ] && return 2
     # Many daemons don't delete their pidfiles when they exit.
     rm -f $PIDFILE
     return "$RETVAL"
@@ -95,7 +94,7 @@ _do_stop_project()
 
 do_start()
 {
-    # Start specific projects if specified
+    ## start specific projects if specified
     if [ $# -gt 1 ]; then
 
         shift
@@ -103,7 +102,7 @@ do_start()
             _do_start_project $PROJECT
         done
 
-    # ... or start all available projects
+    ## ... or start all available projects
     else
 
         for PROJECT in /etc/unicorn_rails.d/*; do
@@ -115,7 +114,7 @@ do_start()
 
 do_stop()
 {
-    # Start specific projects if specified
+    ## start specific projects if specified
     if [ $# -gt 1 ]; then
 
 	shift
@@ -123,7 +122,7 @@ do_stop()
             _do_stop_project $PROJECT.conf
         done
 
-    # ... or start all available projects
+    ## ... or start all available projects
     else
 
         for PROJECT in /etc/unicorn_rails.d/*; do
@@ -158,12 +157,12 @@ case "$1" in
                 do_start $@
                 case "$?" in
                         0) log_end_msg 0 ;;
-                        1) log_end_msg 1 ;; # Old process is still running
-                        *) log_end_msg 1 ;; # Failed to start
+                        1) log_end_msg 1 ;; ## old process is still running
+                        *) log_end_msg 1 ;; ## failed to start
                 esac
                 ;;
           *)
-                # Failed to stop
+                ## failed to stop
                 log_end_msg 1
                 ;;
         esac
@@ -173,4 +172,3 @@ case "$1" in
         exit 3
         ;;
 esac
-
